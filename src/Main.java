@@ -14,6 +14,7 @@ import org.newdawn.slick.gui.MouseOverArea;
 public class Main extends BasicGame {
 	MouseOverArea test;
 	Image walls;
+	String Lukasmussduschen;
 	
 	public Main(String gamename) {
 		super(gamename);
