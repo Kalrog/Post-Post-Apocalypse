@@ -28,6 +28,7 @@ public class Main extends BasicGame {
 	int zoom = 5;
 	int uiSize = 5;
 	UnicodeFont font;
+	String test;
 
 	public Main(String gamename) {
 		super(gamename);
