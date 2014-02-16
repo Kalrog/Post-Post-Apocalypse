@@ -1,11 +1,14 @@
 import java.util.List;
 
+import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 
 public class Tile {
 	/** The damage the tile can take before it gets destroyed */
 	int durability;
+	/** The tile's current health */
+	int health;
 	/** The image used to display the tile */
 	Image display;
 	/** The tile that it will become when being upgraded */
@@ -32,6 +35,7 @@ public class Tile {
 		this.display = display;
 		this.upgrade = upgrade;
 		this.downgrade = downgrade;
+		health = durability;
 	}
 
 	/**
@@ -48,6 +52,7 @@ public class Tile {
 		this.durability = durability;
 		this.display = display;
 		this.upgrade = upgrade;
+		health = durability;
 	}
 
 	/**
@@ -64,6 +69,7 @@ public class Tile {
 		this.durability = durability;
 		this.display = display;
 		this.downgrade = downgrade;
+		health = durability;
 	}
 
 	/**
@@ -73,6 +79,14 @@ public class Tile {
 	 *            The image used to display the tile
 	 */
 	Tile(Image display) {
+		this.display = display;
+	}
+
+	public Image getDisplay() {
+		return display;
+	}
+
+	public void setDisplay(Image display) {
 		this.display = display;
 	}
 
@@ -89,14 +103,16 @@ public class Tile {
 	 * @param zoom
 	 *            The zoom that will be applied
 	 */
-	void draw(float x, float y, float zoom, Graphics g) {
-		x = (x * (display.getWidth() + 2) - ((y + 1) % 2) * display.getWidth()
-				/ 2 + y % 2)
-				* zoom;
-		y = (y - 1) * display.getHeight() / 2 * zoom;
-		g.drawImage(display.getScaledCopy(zoom), x, y);
-		if (items != null)
-			g.drawImage(items.get(items.size()).icon.getScaledCopy(zoom), x, y);
+	void draw(float x, float y, float xoffset, float yoffset, float zoom,
+			GameContainer gc) {
+		float i = x;
+		float j = y;
+		x = xoffset + (i - j) * (display.getWidth() / 2 + 1) * zoom;
+		y = yoffset + (j + i) * display.getHeight() / 2 * zoom;
+		gc.getGraphics().drawImage(display.getScaledCopy(zoom), x, y);
+	}
 
+	Tile getCopy() {
+		return new Tile(display, durability, upgrade, downgrade);
 	}
 }
