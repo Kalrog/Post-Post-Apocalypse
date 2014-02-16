@@ -80,11 +80,25 @@ class Map implements TileBasedMap {
 	}
 
 	@Override
-	public void pathFinderVisited(int x, int y) {}
+	public void pathFinderVisited(int x, int y) {
+	}
 
 	@Override
 	public boolean blocked(PathFindingContext context, int tx, int ty) {
-		return !tiles[tx][ty].getDisplay().equals(open.getDisplay());
+		if (tx < context.getSourceX())
+			return tiles[context.getSourceX()][context.getSourceY()]
+					.getWall(Tile.WALL_UL)
+					|| tiles[tx][ty].getWall(Tile.WALL_LR);
+		if (tx > context.getSourceX())
+			return tiles[context.getSourceX()][context.getSourceY()]
+					.getWall(Tile.WALL_LR)|| tiles[tx][ty].getWall(Tile.WALL_UL);
+		if (ty < context.getSourceY())
+			return tiles[context.getSourceX()][context.getSourceY()]
+					.getWall(Tile.WALL_UR)|| tiles[tx][ty].getWall(Tile.WALL_LL);
+		if (ty > context.getSourceY())
+			return tiles[context.getSourceX()][context.getSourceY()]
+					.getWall(Tile.WALL_LL)|| tiles[tx][ty].getWall(Tile.WALL_UR);
+		return false;
 	}
 
 	@Override

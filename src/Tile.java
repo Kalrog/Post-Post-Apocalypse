@@ -1,5 +1,6 @@
 import java.util.List;
 
+import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
@@ -100,6 +101,14 @@ public class Tile {
 		this.display = display;
 	}
 
+	public boolean getWall(int x) {
+		return wall[x];
+	}
+
+	public void setWall(int x, boolean b) {
+		wall[x] = b;
+	}
+
 	/**
 	 * transforms virtual tile coordinates to screen coordinates and displays
 	 * them
@@ -124,5 +133,22 @@ public class Tile {
 		x = xoffset + (i - j) * (display.getWidth() / 2 + 1) * zoom;
 		y = yoffset + (j + i) * display.getHeight() / 2 * zoom;
 		gc.getGraphics().drawImage(display.getScaledCopy(zoom), x, y);
+		gc.getGraphics().setColor(Color.black);
+		if (wall[WALL_UL])
+			gc.getGraphics().drawLine(x, y + display.getHeight() / 2 * zoom,
+					x + display.getWidth() / 2 * zoom, y);
+		if (wall[WALL_UR])
+			gc.getGraphics().drawLine(x + display.getWidth() / 2 * zoom, y,
+					x + display.getWidth() * zoom,
+					y + display.getHeight() / 2 * zoom);
+		if (wall[WALL_LR])
+			gc.getGraphics().drawLine(x + display.getWidth() * zoom,
+					y + display.getHeight() / 2 * zoom,
+					x + display.getWidth() / 2 * zoom,
+					y + display.getHeight() * zoom);
+		if (wall[WALL_LL])
+			gc.getGraphics().drawLine(x + display.getWidth() / 2 * zoom,
+					y + display.getHeight() * zoom, x,
+					y + display.getHeight() / 2 * zoom);
 	}
 }

@@ -165,8 +165,31 @@ public class Main extends BasicGame {
 				uy = Math.round(uy);
 				ux = Math.round(ux);
 				if (build) {
-					testmap.setTile((int) ux, (int) uy,
-							new Tile(testimg.getSubImage(0, 0, 14, 8)));
+					float ax, ay;
+					ax = testmap.getTile(0, 0).getDisplay().getWidth()
+							/ 2
+							* zoom
+							+ testmap.getX()
+							+ (ux - uy)
+							* (testmap.getTile(0, 0).getDisplay().getWidth() / 2 + 1)
+							* zoom;
+					ay = testmap.getTile(0, 0).getDisplay().getHeight() / 2
+							* zoom + testmap.getY() + (ux + uy)
+							* testmap.getTile(0, 0).getDisplay().getHeight()
+							/ 2 * zoom;
+					if(ax<x){
+						if(ay<y){
+							testmap.getTile((int)ux, (int)uy).setWall(Tile.WALL_LR, false);
+						}else{
+							testmap.getTile((int)ux, (int)uy).setWall(Tile.WALL_UR, false);
+						}
+					}else{
+						if(ay<y){
+							testmap.getTile((int)ux, (int)uy).setWall(Tile.WALL_LL, false);
+						}else{
+							testmap.getTile((int)ux, (int)uy).setWall(Tile.WALL_UL, false);
+						}
+					}
 				}
 			}
 			if (button == 0) {
@@ -175,10 +198,34 @@ public class Main extends BasicGame {
 				ty = Math.round(ty);
 				tx = Math.round(tx);
 				if (build) {
-					testmap.setTile((int) tx, (int) ty,
-							new Tile(testimg.getSubImage(14, 0, 14, 8)));
+					float ax, ay;
+					ax = testmap.getTile(0, 0).getDisplay().getWidth()
+							/ 2
+							* zoom
+							+ testmap.getX()
+							+ (tx - ty)
+							* (testmap.getTile(0, 0).getDisplay().getWidth() / 2 + 1)
+							* zoom;
+					ay = testmap.getTile(0, 0).getDisplay().getHeight() / 2
+							* zoom + testmap.getY() + (tx + ty)
+							* testmap.getTile(0, 0).getDisplay().getHeight()
+							/ 2 * zoom;
+					if(ax<x){
+						if(ay<y){
+							testmap.getTile((int)tx, (int)ty).setWall(Tile.WALL_LR, true);
+						}else{
+							testmap.getTile((int)tx, (int)ty).setWall(Tile.WALL_UR, true);
+						}
+					}else{
+						if(ay<y){
+							testmap.getTile((int)tx, (int)ty).setWall(Tile.WALL_LL, true);
+						}else{
+							testmap.getTile((int)tx, (int)ty).setWall(Tile.WALL_UL, true);
+						}
+					}
 				}
-			}
+				}
+			
 			break;
 		case STATE_PAUSE:
 			break;
