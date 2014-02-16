@@ -36,6 +36,7 @@ public class Main extends BasicGame {
 	float uiSize = 5;
 	UnicodeFont font;
 	Image testimg;
+	Image testimgw;
 	Map testmap;
 	AStarPathFinder testfinder;
 	Path path;
@@ -177,17 +178,21 @@ public class Main extends BasicGame {
 							* zoom + testmap.getY() + (ux + uy)
 							* testmap.getTile(0, 0).getDisplay().getHeight()
 							/ 2 * zoom;
-					if(ax<x){
-						if(ay<y){
-							testmap.getTile((int)ux, (int)uy).setWall(Tile.WALL_LR, false);
-						}else{
-							testmap.getTile((int)ux, (int)uy).setWall(Tile.WALL_UR, false);
+					if (ax < x) {
+						if (ay < y) {
+							testmap.getTile((int) ux, (int) uy).setWall(
+									Tile.WALL_LR, false);
+						} else {
+							testmap.getTile((int) ux, (int) uy - 1).setWall(
+									Tile.WALL_LL, false);
 						}
-					}else{
-						if(ay<y){
-							testmap.getTile((int)ux, (int)uy).setWall(Tile.WALL_LL, false);
-						}else{
-							testmap.getTile((int)ux, (int)uy).setWall(Tile.WALL_UL, false);
+					} else {
+						if (ay < y) {
+							testmap.getTile((int) ux, (int) uy).setWall(
+									Tile.WALL_LL, false);
+						} else {
+							testmap.getTile((int) ux - 1, (int) uy).setWall(
+									Tile.WALL_LR, false);
 						}
 					}
 				}
@@ -210,22 +215,26 @@ public class Main extends BasicGame {
 							* zoom + testmap.getY() + (tx + ty)
 							* testmap.getTile(0, 0).getDisplay().getHeight()
 							/ 2 * zoom;
-					if(ax<x){
-						if(ay<y){
-							testmap.getTile((int)tx, (int)ty).setWall(Tile.WALL_LR, true);
-						}else{
-							testmap.getTile((int)tx, (int)ty).setWall(Tile.WALL_UR, true);
+					if (ax < x) {
+						if (ay < y) {
+							testmap.getTile((int) tx, (int) ty).setWall(
+									Tile.WALL_LR, true);
+						} else {
+							testmap.getTile((int) tx, (int) ty - 1).setWall(
+									Tile.WALL_LL, true);
 						}
-					}else{
-						if(ay<y){
-							testmap.getTile((int)tx, (int)ty).setWall(Tile.WALL_LL, true);
-						}else{
-							testmap.getTile((int)tx, (int)ty).setWall(Tile.WALL_UL, true);
+					} else {
+						if (ay < y) {
+							testmap.getTile((int) tx, (int) ty).setWall(
+									Tile.WALL_LL, true);
+						} else {
+							testmap.getTile((int) tx - 1, (int) ty).setWall(
+									Tile.WALL_LR, true);
 						}
 					}
 				}
-				}
-			
+			}
+
 			break;
 		case STATE_PAUSE:
 			break;
@@ -250,8 +259,12 @@ public class Main extends BasicGame {
 	public void init(GameContainer gc) throws SlickException {
 		testimg = new Image("res/Tiles.png");
 		testimg.setFilter(Image.FILTER_NEAREST);
+		testimgw = new Image("res/Walls.png");
+		testimgw.setFilter(Image.FILTER_NEAREST);
 		testmap = new Map();
-		testmap.test(testimg.getSubImage(0, 0, 14, 8));
+		testmap.test(testimg.getSubImage(0, 0, 14, 8),
+				testimgw.getSubImage(0, 29, 8, 29),
+				testimgw.getSubImage(0, 0, 8, 29));
 		testfinder = new AStarPathFinder(testmap, 100, false);
 		gc.setShowFPS(showFPS);
 		font = new UnicodeFont("res/C&C Red Alert [INET].ttf", 25, false, false);
@@ -299,7 +312,7 @@ public class Main extends BasicGame {
 			break;
 		case STATE_GAME:
 			g.setAntiAlias(false);
-			g.setBackground(Color.darkGray);
+			g.setBackground(Color.black);
 			g.setFont(font);
 			testmap.draw(gc, zoom);
 			if (path != null) {

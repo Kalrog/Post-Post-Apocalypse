@@ -6,20 +6,20 @@ import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 
 public class Tile {
-	/** A wall on the upper left side */
-	public static final int WALL_UL = 0;
-	/** A wall on the upper right side */
-	public static final int WALL_UR = 1;
 	/** A wall on the lower left side */
-	public static final int WALL_LL = 2;
+	public static final int WALL_LL = 0;
 	/** A wall on the lower right side */
-	public static final int WALL_LR = 3;
+	public static final int WALL_LR = 1;
 	/** The damage the tile can take before it gets destroyed */
 	int durability;
 	/** The tile's current health */
 	int health;
 	/** The image used to display the tile */
 	Image display;
+	/** The image used to display the tile's lower left wall */
+	Image llwall;
+	/** The image used to display the tile's lower right wall */
+	Image lrwall;
 	/** The tile that it will become when being upgraded */
 	Tile upgrade;
 	/** The tile it will become when being destroyed */
@@ -27,7 +27,7 @@ public class Tile {
 	/** The items on the tile */
 	List<Item> items;
 	/** The walls of the tile */
-	boolean[] wall = new boolean[4];
+	boolean[] wall = new boolean[2];
 
 	/**
 	 * Creates a new Tile
@@ -133,22 +133,19 @@ public class Tile {
 		x = xoffset + (i - j) * (display.getWidth() / 2 + 1) * zoom;
 		y = yoffset + (j + i) * display.getHeight() / 2 * zoom;
 		gc.getGraphics().drawImage(display.getScaledCopy(zoom), x, y);
-		gc.getGraphics().setColor(Color.black);
-		if (wall[WALL_UL])
-			gc.getGraphics().drawLine(x, y + display.getHeight() / 2 * zoom,
-					x + display.getWidth() / 2 * zoom, y);
-		if (wall[WALL_UR])
-			gc.getGraphics().drawLine(x + display.getWidth() / 2 * zoom, y,
-					x + display.getWidth() * zoom,
-					y + display.getHeight() / 2 * zoom);
+	}
+
+	void drawwall(float x, float y, float xoffset, float yoffset, float zoom,
+			GameContainer gc) {
+		float i = x;
+		float j = y;
+		x = xoffset + (i - j) * (display.getWidth() / 2 + 1) * zoom;
+		y = yoffset + (j + i) * display.getHeight() / 2 * zoom;
 		if (wall[WALL_LR])
-			gc.getGraphics().drawLine(x + display.getWidth() * zoom,
-					y + display.getHeight() / 2 * zoom,
-					x + display.getWidth() / 2 * zoom,
-					y + display.getHeight() * zoom);
+			gc.getGraphics().drawImage(lrwall.getScaledCopy(zoom),
+					x + (display.getWidth() / 2)*zoom, y + display.getHeight()*zoom-lrwall.getHeight()*zoom);
 		if (wall[WALL_LL])
-			gc.getGraphics().drawLine(x + display.getWidth() / 2 * zoom,
-					y + display.getHeight() * zoom, x,
-					y + display.getHeight() / 2 * zoom);
+			gc.getGraphics().drawImage(llwall.getScaledCopy(zoom), x-1*zoom,
+					y + display.getHeight()*zoom-llwall.getHeight()*zoom);
 	}
 }

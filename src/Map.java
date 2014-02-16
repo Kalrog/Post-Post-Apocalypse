@@ -11,7 +11,6 @@ class Map implements TileBasedMap {
 	public static final int MAP_SIZE = 20;
 	/** The tiles that make up the map */
 	Tile[][] tiles = new Tile[MAP_SIZE][MAP_SIZE];
-	Tile open;
 	/** The units that are currently on the map */
 	List<Unit> units;
 	/** The current x offset */
@@ -31,6 +30,11 @@ class Map implements TileBasedMap {
 		for (int i = 0; i < MAP_SIZE; i++) {
 			for (int j = 0; j < MAP_SIZE; j++) {
 				tiles[i][j].draw(i, j, x, y, zoom, gc);
+			}
+		}
+		for (int i = 0; i < MAP_SIZE; i++) {
+			for (int j = 0; j < MAP_SIZE; j++) {
+				tiles[i][j].drawwall(i, j, x, y, zoom, gc);
 			}
 		}
 
@@ -60,11 +64,12 @@ class Map implements TileBasedMap {
 		tiles[x][y] = t;
 	}
 
-	public void test(Image testimg) {
-		open = new Tile(testimg);
+	public void test(Image testimg, Image llwall, Image lrwall) {
 		for (int i = 0; i < MAP_SIZE; i++) {
 			for (int j = 0; j < MAP_SIZE; j++) {
 				tiles[i][j] = new Tile(testimg);
+				tiles[i][j].llwall = llwall;
+				tiles[i][j].lrwall = lrwall;
 			}
 		}
 	}
@@ -86,18 +91,15 @@ class Map implements TileBasedMap {
 	@Override
 	public boolean blocked(PathFindingContext context, int tx, int ty) {
 		if (tx < context.getSourceX())
-			return tiles[context.getSourceX()][context.getSourceY()]
-					.getWall(Tile.WALL_UL)
-					|| tiles[tx][ty].getWall(Tile.WALL_LR);
+			return tiles[tx][ty].getWall(Tile.WALL_LR);
 		if (tx > context.getSourceX())
 			return tiles[context.getSourceX()][context.getSourceY()]
-					.getWall(Tile.WALL_LR)|| tiles[tx][ty].getWall(Tile.WALL_UL);
+					.getWall(Tile.WALL_LR);
 		if (ty < context.getSourceY())
-			return tiles[context.getSourceX()][context.getSourceY()]
-					.getWall(Tile.WALL_UR)|| tiles[tx][ty].getWall(Tile.WALL_LL);
+			return tiles[tx][ty].getWall(Tile.WALL_LL);
 		if (ty > context.getSourceY())
 			return tiles[context.getSourceX()][context.getSourceY()]
-					.getWall(Tile.WALL_LL)|| tiles[tx][ty].getWall(Tile.WALL_UR);
+					.getWall(Tile.WALL_LL);
 		return false;
 	}
 
