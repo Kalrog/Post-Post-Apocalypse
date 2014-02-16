@@ -12,6 +12,8 @@ import org.newdawn.slick.SlickException;
 import org.newdawn.slick.UnicodeFont;
 import org.newdawn.slick.font.effects.ColorEffect;
 import org.newdawn.slick.font.effects.OutlineEffect;
+import org.newdawn.slick.util.pathfinding.AStarPathFinder;
+import org.newdawn.slick.util.pathfinding.Path;
 
 public class Main extends BasicGame {
 	/** The game is in the main menu */
@@ -27,13 +29,16 @@ public class Main extends BasicGame {
 
 	boolean showFPS = true;
 	boolean init = true;
-	int gamestate = STATE_GAME;
-	float tx, ty;
+	boolean build = false;
+	int gamestate = STATE_MAINMENU;
+	float tx, ty, ux, uy;
 	float zoom = 2;
 	float uiSize = 5;
 	UnicodeFont font;
 	Image testimg;
 	Map testmap;
+	AStarPathFinder testfinder;
+	Path path;
 
 	public Main(String gamename) {
 		super(gamename);
@@ -47,6 +52,11 @@ public class Main extends BasicGame {
 		case STATE_OPTIONSMENU:
 			break;
 		case STATE_GAME:
+			if (c == 'b')
+				build = !build;
+			if (c == 'g')
+				path = testfinder.findPath(null, (int) tx, (int) ty, (int) ux,
+						(int) uy);
 			break;
 		case STATE_PAUSE:
 			break;
@@ -108,8 +118,10 @@ public class Main extends BasicGame {
 		case STATE_OPTIONSMENU:
 			break;
 		case STATE_GAME:
-			testmap.setX(testmap.getX() + newx - oldx);
-			testmap.setY(testmap.getY() + newy - oldy);
+			if (!build) {
+				testmap.setX(testmap.getX() + newx - oldx);
+				testmap.setY(testmap.getY() + newy - oldy);
+			}
 			break;
 		case STATE_PAUSE:
 			break;
@@ -134,6 +146,7 @@ public class Main extends BasicGame {
 	public void mousePressed(int button, int x, int y) {
 		switch (gamestate) {
 		case STATE_MAINMENU:
+			gamestate = STATE_GAME;
 			break;
 		case STATE_OPTIONSMENU:
 			break;
@@ -146,10 +159,26 @@ public class Main extends BasicGame {
 					.getHeight()
 					/ 2 * zoom)
 					/ ((testmap.getTile(0, 0).getDisplay().getHeight() / 2) * zoom);
-			ty = (b - a)/2;
-			tx = b - ty;
-			ty = Math.round(ty);
-			tx = Math.round(tx);
+			if (button == 1) {
+				uy = (b - a) / 2;
+				ux = b - uy;
+				uy = Math.round(uy);
+				ux = Math.round(ux);
+				if (build) {
+					testmap.setTile((int) ux, (int) uy,
+							new Tile(testimg.getSubImage(0, 0, 14, 8)));
+				}
+			}
+			if (button == 0) {
+				ty = (b - a) / 2;
+				tx = b - ty;
+				ty = Math.round(ty);
+				tx = Math.round(tx);
+				if (build) {
+					testmap.setTile((int) tx, (int) ty,
+							new Tile(testimg.getSubImage(14, 0, 14, 8)));
+				}
+			}
 			break;
 		case STATE_PAUSE:
 			break;
@@ -175,7 +204,8 @@ public class Main extends BasicGame {
 		testimg = new Image("res/Tiles.png");
 		testimg.setFilter(Image.FILTER_NEAREST);
 		testmap = new Map();
-		testmap.test(testimg.getSubImage(14, 0, 14, 8));
+		testmap.test(testimg.getSubImage(0, 0, 14, 8));
+		testfinder = new AStarPathFinder(testmap, 100, false);
 		gc.setShowFPS(showFPS);
 		font = new UnicodeFont("res/C&C Red Alert [INET].ttf", 25, false, false);
 		font.setPaddingLeft(5);
@@ -213,6 +243,10 @@ public class Main extends BasicGame {
 			g.setAntiAlias(false);
 			g.setBackground(Color.darkGray);
 			g.setFont(font);
+			g.drawString("Keys:\n" + "toggle build mode:b\n" + "point 1:LMB\n"
+					+ "point 2:RMB\n"
+					+ "generate path from point 1 to point 2:g\n"
+					+ "click anywhere to start", 300, 200);
 			break;
 		case STATE_OPTIONSMENU:
 			break;
@@ -221,8 +255,45 @@ public class Main extends BasicGame {
 			g.setBackground(Color.darkGray);
 			g.setFont(font);
 			testmap.draw(gc, zoom);
-			// g.drawString("zoom:" + zoom, 600, 400);
+			if (path != null) {
+				for (int n = 1; n < path.getLength(); n++) {
+					float ax, ay, bx, by;
+					ax = testmap.getTile(0, 0).getDisplay().getWidth()
+							/ 2
+							* zoom
+							+ testmap.getX()
+							+ (path.getStep(n).getX() - path.getStep(n).getY())
+							* (testmap.getTile(0, 0).getDisplay().getWidth() / 2 + 1)
+							* zoom;
+					ay = testmap.getTile(0, 0).getDisplay().getHeight() / 2
+							* zoom + testmap.getY()
+							+ (path.getStep(n).getX() + path.getStep(n).getY())
+							* testmap.getTile(0, 0).getDisplay().getHeight()
+							/ 2 * zoom;
+					bx = testmap.getTile(0, 0).getDisplay().getWidth()
+							/ 2
+							* zoom
+							+ testmap.getX()
+							+ (path.getStep(n - 1).getX() - path.getStep(n - 1)
+									.getY())
+							* (testmap.getTile(0, 0).getDisplay().getWidth() / 2 + 1)
+							* zoom;
+					by = testmap.getTile(0, 0).getDisplay().getHeight()
+							/ 2
+							* zoom
+							+ testmap.getY()
+							+ (path.getStep(n - 1).getX() + path.getStep(n - 1)
+									.getY())
+							* testmap.getTile(0, 0).getDisplay().getHeight()
+							/ 2 * zoom;
+					g.setColor(Color.red);
+					g.drawLine(ax, ay, bx, by);
+				}
+			}
+			g.setColor(Color.white);
 			g.drawString(tx + "," + ty, 600, 400);
+			g.drawString(ux + "," + uy, 600, 430);
+			g.drawString("x" + zoom, 600, 460);
 			break;
 		case STATE_PAUSE:
 			break;

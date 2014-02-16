@@ -3,12 +3,15 @@ import java.util.List;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
+import org.newdawn.slick.util.pathfinding.PathFindingContext;
+import org.newdawn.slick.util.pathfinding.TileBasedMap;
 
-class Map {
+class Map implements TileBasedMap {
 	/** The map size */
 	public static final int MAP_SIZE = 20;
 	/** The tiles that make up the map */
 	Tile[][] tiles = new Tile[MAP_SIZE][MAP_SIZE];
+	Tile open;
 	/** The units that are currently on the map */
 	List<Unit> units;
 	/** The current x offset */
@@ -58,11 +61,35 @@ class Map {
 	}
 
 	public void test(Image testimg) {
+		open = new Tile(testimg);
 		for (int i = 0; i < MAP_SIZE; i++) {
 			for (int j = 0; j < MAP_SIZE; j++) {
 				tiles[i][j] = new Tile(testimg);
 			}
 		}
+	}
+
+	@Override
+	public int getWidthInTiles() {
+		return MAP_SIZE;
+	}
+
+	@Override
+	public int getHeightInTiles() {
+		return MAP_SIZE;
+	}
+
+	@Override
+	public void pathFinderVisited(int x, int y) {}
+
+	@Override
+	public boolean blocked(PathFindingContext context, int tx, int ty) {
+		return !tiles[tx][ty].getDisplay().equals(open.getDisplay());
+	}
+
+	@Override
+	public float getCost(PathFindingContext context, int tx, int ty) {
+		return 1.0f;
 	}
 
 }
