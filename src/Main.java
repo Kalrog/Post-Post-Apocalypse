@@ -288,6 +288,11 @@ public class Main extends BasicGame {
 							/ 2 * zoom;
 					g.setColor(Color.red);
 					g.drawLine(ax, ay, bx, by);
+					if (n > 1 && n < path.getLength() - 1)
+						if (path.getStep(n).getX() - path.getStep(n - 1).getX() != path
+								.getStep(n + 1).getX() - path.getStep(n).getX())
+							g.drawRect(ax - 4, ay - 4, 8, 8);
+
 				}
 			}
 			g.setColor(Color.white);

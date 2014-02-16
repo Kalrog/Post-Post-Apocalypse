@@ -5,6 +5,14 @@ import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 
 public class Tile {
+	/** A wall on the upper left side */
+	public static final int WALL_UL = 0;
+	/** A wall on the upper right side */
+	public static final int WALL_UR = 1;
+	/** A wall on the lower left side */
+	public static final int WALL_LL = 2;
+	/** A wall on the lower right side */
+	public static final int WALL_LR = 3;
 	/** The damage the tile can take before it gets destroyed */
 	int durability;
 	/** The tile's current health */
@@ -17,6 +25,8 @@ public class Tile {
 	Tile downgrade;
 	/** The items on the tile */
 	List<Item> items;
+	/** The walls of the tile */
+	boolean[] wall = new boolean[4];
 
 	/**
 	 * Creates a new Tile
@@ -98,10 +108,14 @@ public class Tile {
 	 *            The x-coordinate of the tile
 	 * @param y
 	 *            The y-coordinate of the tile
-	 * @param g
-	 *            The Graphics to be draw on
+	 * @param gc
+	 *            The GameContainter that will be drawn on
 	 * @param zoom
 	 *            The zoom that will be applied
+	 * @param xoffset
+	 *            The x offset that will be used
+	 * @param yoffset
+	 *            The y offset that will be used
 	 */
 	void draw(float x, float y, float xoffset, float yoffset, float zoom,
 			GameContainer gc) {
@@ -110,9 +124,5 @@ public class Tile {
 		x = xoffset + (i - j) * (display.getWidth() / 2 + 1) * zoom;
 		y = yoffset + (j + i) * display.getHeight() / 2 * zoom;
 		gc.getGraphics().drawImage(display.getScaledCopy(zoom), x, y);
-	}
-
-	Tile getCopy() {
-		return new Tile(display, durability, upgrade, downgrade);
 	}
 }
