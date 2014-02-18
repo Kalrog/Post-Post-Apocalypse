@@ -1,8 +1,6 @@
 import java.util.List;
 
-import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
-import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 
 public class Tile {
@@ -109,6 +107,22 @@ public class Tile {
 		wall[x] = b;
 	}
 
+	public Image getLlwall() {
+		return llwall;
+	}
+
+	public void setLlwall(Image llwall) {
+		this.llwall = llwall;
+	}
+
+	public Image getLrwall() {
+		return lrwall;
+	}
+
+	public void setLrwall(Image lrwall) {
+		this.lrwall = lrwall;
+	}
+
 	/**
 	 * transforms virtual tile coordinates to screen coordinates and displays
 	 * them
@@ -121,31 +135,33 @@ public class Tile {
 	 *            The GameContainter that will be drawn on
 	 * @param zoom
 	 *            The zoom that will be applied
-	 * @param xoffset
-	 *            The x offset that will be used
-	 * @param yoffset
-	 *            The y offset that will be used
 	 */
-	void draw(float x, float y, float xoffset, float yoffset, float zoom,
-			GameContainer gc) {
-		float i = x;
-		float j = y;
-		x = xoffset + (i - j) * (display.getWidth() / 2 + 1) * zoom;
-		y = yoffset + (j + i) * display.getHeight() / 2 * zoom;
+	void draw(float x, float y, float zoom, GameContainer gc) {
 		gc.getGraphics().drawImage(display.getScaledCopy(zoom), x, y);
 	}
 
-	void drawwall(float x, float y, float xoffset, float yoffset, float zoom,
-			GameContainer gc) {
-		float i = x;
-		float j = y;
-		x = xoffset + (i - j) * (display.getWidth() / 2 + 1) * zoom;
-		y = yoffset + (j + i) * display.getHeight() / 2 * zoom;
+	/**
+	 * transforms virtual tile coordinates to screen coordinates and displays
+	 * their walls
+	 * 
+	 * @param x
+	 *            The x-coordinate of the tile
+	 * @param y
+	 *            The y-coordinate of the tile
+	 * @param gc
+	 *            The GameContainter that will be drawn on
+	 * @param zoom
+	 *            The zoom that will be applied
+
+	 */
+	void drawwall(float x, float y, float zoom, GameContainer gc) {
 		if (wall[WALL_LR])
 			gc.getGraphics().drawImage(lrwall.getScaledCopy(zoom),
-					x + (display.getWidth() / 2)*zoom, y + display.getHeight()*zoom-lrwall.getHeight()*zoom);
+					x + (display.getWidth() / 2) * zoom,
+					y + (display.getHeight() - lrwall.getHeight()) * zoom);
 		if (wall[WALL_LL])
-			gc.getGraphics().drawImage(llwall.getScaledCopy(zoom), x-1*zoom,
-					y + display.getHeight()*zoom-llwall.getHeight()*zoom);
+			gc.getGraphics().drawImage(llwall.getScaledCopy(zoom),
+					x - 1 * zoom,
+					y + (display.getHeight() - llwall.getHeight()) * zoom);
 	}
 }

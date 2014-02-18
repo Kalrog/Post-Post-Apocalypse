@@ -1,6 +1,7 @@
 import java.util.List;
 
 import org.newdawn.slick.Image;
+import org.newdawn.slick.util.pathfinding.Path;
 
 public class Unit {
 	/** The unit is controlled by the zombie AI */
@@ -24,4 +25,6 @@ public class Unit {
 	List<Item> inventory;
 	/** The image used to display the unit */
 	Image display;
+	/** The path the Unit is following*/
+	Path path;
 }

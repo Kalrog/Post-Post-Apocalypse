@@ -30,15 +30,17 @@ public class Main extends BasicGame {
 	boolean showFPS = true;
 	boolean init = true;
 	boolean build = false;
+	boolean rect = false;
+	boolean drag = false;
+	boolean dragr = false;
 	int gamestate = STATE_MAINMENU;
 	float tx, ty, ux, uy;
-	float zoom = 2;
 	float uiSize = 5;
 	UnicodeFont font;
-	Image testimg;
-	Image testimgw;
-	Map testmap;
-	AStarPathFinder testfinder;
+	int startx, starty;
+
+	Map map;
+	AStarPathFinder pathfinder;
 	Path path;
 
 	public Main(String gamename) {
@@ -55,8 +57,10 @@ public class Main extends BasicGame {
 		case STATE_GAME:
 			if (c == 'b')
 				build = !build;
+			if (c == 'r')
+				rect = !rect;
 			if (c == 'g')
-				path = testfinder.findPath(null, (int) tx, (int) ty, (int) ux,
+				path = pathfinder.findPath(null, (int) tx, (int) ty, (int) ux,
 						(int) uy);
 			break;
 		case STATE_PAUSE:
@@ -100,10 +104,10 @@ public class Main extends BasicGame {
 		case STATE_OPTIONSMENU:
 			break;
 		case STATE_GAME:
-			if (change < 0 && zoom > 1)
-				zoom--;
+			if (change < 0 && ITPT.zoom > 1)
+				ITPT.zoom--;
 			if (change > 0)
-				zoom++;
+				ITPT.zoom++;
 			break;
 		case STATE_PAUSE:
 			break;
@@ -120,8 +124,8 @@ public class Main extends BasicGame {
 			break;
 		case STATE_GAME:
 			if (!build) {
-				testmap.setX(testmap.getX() + newx - oldx);
-				testmap.setY(testmap.getY() + newy - oldy);
+				ITPT.xoffset = ITPT.xoffset + newx - oldx;
+				ITPT.yoffset = ITPT.yoffset + newy - oldy;
 			}
 			break;
 		case STATE_PAUSE:
@@ -152,89 +156,44 @@ public class Main extends BasicGame {
 		case STATE_OPTIONSMENU:
 			break;
 		case STATE_GAME:
-			float a = (x - testmap.getX() - testmap.getTile(0, 0).getDisplay()
-					.getWidth()
-					/ 2 * zoom)
-					/ ((testmap.getTile(0, 0).getDisplay().getWidth() / 2 + 1) * zoom);
-			float b = (y - testmap.getY() - testmap.getTile(0, 0).getDisplay()
-					.getHeight()
-					/ 2 * zoom)
-					/ ((testmap.getTile(0, 0).getDisplay().getHeight() / 2) * zoom);
-			if (button == 1) {
-				uy = (b - a) / 2;
-				ux = b - uy;
-				uy = Math.round(uy);
-				ux = Math.round(ux);
-				if (build) {
-					float ax, ay;
-					ax = testmap.getTile(0, 0).getDisplay().getWidth()
-							/ 2
-							* zoom
-							+ testmap.getX()
-							+ (ux - uy)
-							* (testmap.getTile(0, 0).getDisplay().getWidth() / 2 + 1)
-							* zoom;
-					ay = testmap.getTile(0, 0).getDisplay().getHeight() / 2
-							* zoom + testmap.getY() + (ux + uy)
-							* testmap.getTile(0, 0).getDisplay().getHeight()
-							/ 2 * zoom;
-					if (ax < x) {
-						if (ay < y) {
-							testmap.getTile((int) ux, (int) uy).setWall(
-									Tile.WALL_LR, false);
-						} else {
-							testmap.getTile((int) ux, (int) uy - 1).setWall(
-									Tile.WALL_LL, false);
-						}
+			if (button == 0)
+				drag = true;
+			if (button == 1)
+				dragr = true;
+			startx = x;
+			starty = y;
+			float sx = ITPT.tileatX(x, y);
+			float sy = ITPT.tileatY(x, y);
+			float ax = ITPT.tilewidth / 2 * ITPT.zoom + ITPT.tileX(sx, sy);
+			float ay = ITPT.tileheight / 2 * ITPT.zoom + ITPT.tileY(sx, sy);
+			if (build && !rect) {
+				if (ax < x) {
+					if (ay < y) {
+						map.getTile((int) sx, (int) sy).setWall(Tile.WALL_LR,
+								button == 0);
 					} else {
-						if (ay < y) {
-							testmap.getTile((int) ux, (int) uy).setWall(
-									Tile.WALL_LL, false);
-						} else {
-							testmap.getTile((int) ux - 1, (int) uy).setWall(
-									Tile.WALL_LR, false);
-						}
+						map.getTile((int) sx, (int) sy - 1).setWall(
+								Tile.WALL_LL, button == 0);
+					}
+				} else {
+					if (ay < y) {
+						map.getTile((int) sx, (int) sy).setWall(Tile.WALL_LL,
+								button == 0);
+					} else {
+						map.getTile((int) sx - 1, (int) sy).setWall(
+								Tile.WALL_LR, button == 0);
 					}
 				}
-			}
-			if (button == 0) {
-				ty = (b - a) / 2;
-				tx = b - ty;
-				ty = Math.round(ty);
-				tx = Math.round(tx);
-				if (build) {
-					float ax, ay;
-					ax = testmap.getTile(0, 0).getDisplay().getWidth()
-							/ 2
-							* zoom
-							+ testmap.getX()
-							+ (tx - ty)
-							* (testmap.getTile(0, 0).getDisplay().getWidth() / 2 + 1)
-							* zoom;
-					ay = testmap.getTile(0, 0).getDisplay().getHeight() / 2
-							* zoom + testmap.getY() + (tx + ty)
-							* testmap.getTile(0, 0).getDisplay().getHeight()
-							/ 2 * zoom;
-					if (ax < x) {
-						if (ay < y) {
-							testmap.getTile((int) tx, (int) ty).setWall(
-									Tile.WALL_LR, true);
-						} else {
-							testmap.getTile((int) tx, (int) ty - 1).setWall(
-									Tile.WALL_LL, true);
-						}
-					} else {
-						if (ay < y) {
-							testmap.getTile((int) tx, (int) ty).setWall(
-									Tile.WALL_LL, true);
-						} else {
-							testmap.getTile((int) tx - 1, (int) ty).setWall(
-									Tile.WALL_LR, true);
-						}
-					}
+			} else {
+				if (button == 0) {
+					ty = sy;
+					tx = sx;
+				}
+				if (button == 1) {
+					uy = sy;
+					ux = sx;
 				}
 			}
-
 			break;
 		case STATE_PAUSE:
 			break;
@@ -249,23 +208,94 @@ public class Main extends BasicGame {
 		case STATE_OPTIONSMENU:
 			break;
 		case STATE_GAME:
+			if (build && rect && (drag || dragr)) {
+				float sx, sy, ex, ey;
+				sx = ITPT.tileatX(startx, starty);
+				sy = ITPT.tileatY(startx, starty);
+				ex = ITPT.tileatX(x, y);
+				ey = ITPT.tileatY(x, y);
+				if (sx + sy > ex + ey) {
+					for (int i = (int) ex; i <= sx; i++) {
+						for (int j = (int) ey; j <= sy; j++) {
+							if (dragr) {
+								map.getTile(i, j).setWall(Tile.WALL_LR, false);
+								map.getTile(i, j).setWall(Tile.WALL_LL, false);
+							}
+							if (drag) {
+								if (i == (int) ex) {
+									map.getTile(i - 1, j).setWall(Tile.WALL_LR,
+											true);
+								}
+								if (j == (int) ey) {
+									map.getTile(i, j - 1).setWall(Tile.WALL_LL,
+											true);
+								}
+								if (i == (int) sx) {
+									map.getTile(i, j).setWall(Tile.WALL_LR,
+											true);
+								}
+								if (j == (int) sy) {
+									map.getTile(i, j).setWall(Tile.WALL_LL,
+											true);
+								}
+							}
+						}
+					}
+				} else {
+					for (int i = (int) sx; i <= ex; i++) {
+						for (int j = (int) sy; j <= ey; j++) {
+							if (dragr) {
+								map.getTile(i, j).setWall(Tile.WALL_LR, false);
+								map.getTile(i, j).setWall(Tile.WALL_LL, false);
+							}
+							if (drag) {
+								if (i == (int) sx) {
+									map.getTile(i - 1, j).setWall(Tile.WALL_LR,
+											true);
+								}
+								if (j == (int) sy) {
+									map.getTile(i, j - 1).setWall(Tile.WALL_LL,
+											true);
+								}
+								if (i == (int) ex) {
+									map.getTile(i, j).setWall(Tile.WALL_LR,
+											true);
+								}
+								if (j == (int) ey) {
+									map.getTile(i, j).setWall(Tile.WALL_LL,
+											true);
+								}
+							}
+						}
+					}
+				}
+			}
+			drag = false;
+			dragr = false;
 			break;
 		case STATE_PAUSE:
 			break;
 		}
 	}
 
+	public static void main(String[] args) {
+		try {
+			AppGameContainer appgc;
+			appgc = new AppGameContainer(new Main("ZOMBIES!"));
+			appgc.setDisplayMode(WINDOW_WIDTH, WINDOW_HEIGHT, false);
+			appgc.start();
+		} catch (SlickException ex) {
+			Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+		}
+	}
+
+	@SuppressWarnings("unchecked")
 	@Override
 	public void init(GameContainer gc) throws SlickException {
-		testimg = new Image("res/Tiles.png");
-		testimg.setFilter(Image.FILTER_NEAREST);
-		testimgw = new Image("res/Walls.png");
-		testimgw.setFilter(Image.FILTER_NEAREST);
-		testmap = new Map();
-		testmap.test(testimg.getSubImage(0, 0, 14, 8),
-				testimgw.getSubImage(0, 29, 8, 29),
-				testimgw.getSubImage(0, 0, 8, 29));
-		testfinder = new AStarPathFinder(testmap, 100, false);
+		ITPT.configure(0, 0, 14, 8, 8, 23, 2);
+		map = new Map(new Image("res/Tiles.png"), new Image("res/Walls.png"));
+		map.test();
+		pathfinder = new AStarPathFinder(map, 100, false);
 		gc.setShowFPS(showFPS);
 		font = new UnicodeFont("res/C&C Red Alert [INET].ttf", 25, false, false);
 		font.setPaddingLeft(5);
@@ -303,7 +333,8 @@ public class Main extends BasicGame {
 			g.setAntiAlias(false);
 			g.setBackground(Color.darkGray);
 			g.setFont(font);
-			g.drawString("Keys:\n" + "toggle build mode:b\n" + "point 1:LMB\n"
+			g.drawString("Keys:\n" + "toggle build mode:b\n"
+					+ "toggle rectangle build mode:r\n" + "point 1:LMB\n"
 					+ "point 2:RMB\n"
 					+ "generate path from point 1 to point 2:g\n"
 					+ "click anywhere to start", 300, 200);
@@ -314,65 +345,54 @@ public class Main extends BasicGame {
 			g.setAntiAlias(false);
 			g.setBackground(Color.black);
 			g.setFont(font);
-			testmap.draw(gc, zoom);
+			map.draw(gc);
 			if (path != null) {
 				for (int n = 1; n < path.getLength(); n++) {
 					float ax, ay, bx, by;
-					ax = testmap.getTile(0, 0).getDisplay().getWidth()
+					ax = ITPT.tilewidth
 							/ 2
-							* zoom
-							+ testmap.getX()
-							+ (path.getStep(n).getX() - path.getStep(n).getY())
-							* (testmap.getTile(0, 0).getDisplay().getWidth() / 2 + 1)
-							* zoom;
-					ay = testmap.getTile(0, 0).getDisplay().getHeight() / 2
-							* zoom + testmap.getY()
-							+ (path.getStep(n).getX() + path.getStep(n).getY())
-							* testmap.getTile(0, 0).getDisplay().getHeight()
-							/ 2 * zoom;
-					bx = testmap.getTile(0, 0).getDisplay().getWidth()
+							* ITPT.zoom
+							+ ITPT.tileX(path.getStep(n).getX(), path
+									.getStep(n).getY());
+					ay = ITPT.tileheight
 							/ 2
-							* zoom
-							+ testmap.getX()
-							+ (path.getStep(n - 1).getX() - path.getStep(n - 1)
-									.getY())
-							* (testmap.getTile(0, 0).getDisplay().getWidth() / 2 + 1)
-							* zoom;
-					by = testmap.getTile(0, 0).getDisplay().getHeight()
+							* ITPT.zoom
+							+ ITPT.tileY(path.getStep(n).getX(), path
+									.getStep(n).getY());
+					bx = ITPT.tilewidth
 							/ 2
-							* zoom
-							+ testmap.getY()
-							+ (path.getStep(n - 1).getX() + path.getStep(n - 1)
-									.getY())
-							* testmap.getTile(0, 0).getDisplay().getHeight()
-							/ 2 * zoom;
+							* ITPT.zoom
+							+ ITPT.tileX(path.getStep(n - 1).getX(), path
+									.getStep(n - 1).getY());
+					;
+					by = ITPT.tileheight
+							/ 2
+							* ITPT.zoom
+							+ ITPT.tileY(path.getStep(n - 1).getX(), path
+									.getStep(n - 1).getY());
+					;
 					g.setColor(Color.red);
 					g.drawLine(ax, ay, bx, by);
-					if (n > 1 && n < path.getLength() - 1)
+					if (n > 1 && n < path.getLength() - 1) {
 						if (path.getStep(n).getX() - path.getStep(n - 1).getX() != path
 								.getStep(n + 1).getX() - path.getStep(n).getX())
 							g.drawRect(ax - 4, ay - 4, 8, 8);
+						if (path.getStep(n).getY() - path.getStep(n - 1).getY() != path
+								.getStep(n + 1).getY() - path.getStep(n).getY())
+							g.drawRect(ax - 4, ay - 4, 8, 8);
+					}
 
 				}
 			}
 			g.setColor(Color.white);
 			g.drawString(tx + "," + ty, 600, 400);
 			g.drawString(ux + "," + uy, 600, 430);
-			g.drawString("x" + zoom, 600, 460);
+			g.drawString("x" + ITPT.zoom, 600, 460);
+			g.drawString("Build:"+build,600, 490);
+			g.drawString("Rectangle:"+rect,600, 520);
 			break;
 		case STATE_PAUSE:
 			break;
-		}
-	}
-
-	public static void main(String[] args) {
-		try {
-			AppGameContainer appgc;
-			appgc = new AppGameContainer(new Main("ZOMBIES!"));
-			appgc.setDisplayMode(WINDOW_WIDTH, WINDOW_HEIGHT, false);
-			appgc.start();
-		} catch (SlickException ex) {
-			Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
 		}
 	}
 }
