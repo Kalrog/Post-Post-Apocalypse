@@ -24,7 +24,9 @@ public class Main extends BasicGame {
 	public static final int STATE_GAME = 2;
 	/** The game is displaying the in-game pause menu */
 	public static final int STATE_PAUSE = 3;
+	/** The window's width */
 	public static final int WINDOW_WIDTH = 800;
+	/** The window's height */
 	public static final int WINDOW_HEIGHT = 600;
 
 	boolean showFPS = true;
@@ -35,10 +37,9 @@ public class Main extends BasicGame {
 	boolean dragr = false;
 	int gamestate = STATE_MAINMENU;
 	float tx, ty, ux, uy;
+	int startx, starty;
 	float uiSize = 5;
 	UnicodeFont font;
-	int startx, starty;
-
 	Map map;
 	AStarPathFinder pathfinder;
 	Path path;
@@ -104,10 +105,12 @@ public class Main extends BasicGame {
 		case STATE_OPTIONSMENU:
 			break;
 		case STATE_GAME:
-			if (change < 0 && ITPT.zoom > 1)
+			if (change < 0 && ITPT.zoom > 1) {
 				ITPT.zoom--;
-			if (change > 0)
+			}
+			if (change > 0) {
 				ITPT.zoom++;
+			}
 			break;
 		case STATE_PAUSE:
 			break;
@@ -292,11 +295,12 @@ public class Main extends BasicGame {
 	@SuppressWarnings("unchecked")
 	@Override
 	public void init(GameContainer gc) throws SlickException {
-		ITPT.configure(0, 0, 14, 8, 8, 23, 2);
+		ITPT.configure(gc.getWidth() / 2, -gc.getHeight() / 2, 14, 8, 8, 25, 2);
 		map = new Map(new Image("res/Tiles.png"), new Image("res/Walls.png"));
 		map.test();
-		pathfinder = new AStarPathFinder(map, 100, false);
+		pathfinder = new AStarPathFinder(map, 300, false);
 		gc.setShowFPS(showFPS);
+		gc.setVSync(true);
 		font = new UnicodeFont("res/C&C Red Alert [INET].ttf", 25, false, false);
 		font.setPaddingLeft(5);
 		font.setPaddingRight(5);
@@ -373,6 +377,10 @@ public class Main extends BasicGame {
 					;
 					g.setColor(Color.red);
 					g.drawLine(ax, ay, bx, by);
+					if (n == 1)
+						g.drawRect(bx - 4, by - 4, 8, 8);
+					if (n == path.getLength() - 1)
+						g.drawRect(ax - 4, ay - 4, 8, 8);
 					if (n > 1 && n < path.getLength() - 1) {
 						if (path.getStep(n).getX() - path.getStep(n - 1).getX() != path
 								.getStep(n + 1).getX() - path.getStep(n).getX())
@@ -388,8 +396,8 @@ public class Main extends BasicGame {
 			g.drawString(tx + "," + ty, 600, 400);
 			g.drawString(ux + "," + uy, 600, 430);
 			g.drawString("x" + ITPT.zoom, 600, 460);
-			g.drawString("Build:"+build,600, 490);
-			g.drawString("Rectangle:"+rect,600, 520);
+			g.drawString("Build:" + build, 600, 490);
+			g.drawString("Rectangle:" + rect, 600, 520);
 			break;
 		case STATE_PAUSE:
 			break;

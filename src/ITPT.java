@@ -8,8 +8,8 @@ public final class ITPT {
 	static int wallheight;
 	static float zoom;
 
-	
-	public static void configure(float x, float y, int tw, int th, int ww, int wh, float z) {
+	public static void configure(float x, float y, int tw, int th, int ww,
+			int wh, float z) {
 		xoffset = x;
 		yoffset = y;
 		tilewidth = tw;
