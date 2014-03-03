@@ -1,4 +1,3 @@
-import java.util.List;
 
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Image;
@@ -23,7 +22,7 @@ public class Tile {
 	/** The tile it will become when being destroyed */
 	Tile downgrade;
 	/** The items on the tile */
-	List<Item> items;
+	Item[] items = new Item[10];
 	/** The walls of the tile */
 	boolean[] wall = new boolean[2];
 
@@ -133,16 +132,13 @@ public class Tile {
 	 *            The y-coordinate of the tile
 	 * @param gc
 	 *            The GameContainter that will be drawn on
-	 * @param zoom
-	 *            The zoom that will be applied
 	 */
-	void draw(float x, float y, float zoom, GameContainer gc) {
-		gc.getGraphics().drawImage(display.getScaledCopy(zoom), x, y);
+	void draw(float x, float y, GameContainer gc) {
+		gc.getGraphics().drawImage(display.getScaledCopy(ITPT.zoom), x, y);
 	}
 
 	/**
-	 * transforms virtual tile coordinates to screen coordinates and displays
-	 * their walls
+	 * displays the tiles walls
 	 * 
 	 * @param x
 	 *            The x-coordinate of the tile
@@ -152,16 +148,15 @@ public class Tile {
 	 *            The GameContainter that will be drawn on
 	 * @param zoom
 	 *            The zoom that will be applied
-
 	 */
-	void drawwall(float x, float y, float zoom, GameContainer gc) {
+	void drawwall(float x, float y, GameContainer gc) {
 		if (wall[WALL_LR])
-			gc.getGraphics().drawImage(lrwall.getScaledCopy(zoom),
-					x + (display.getWidth() / 2) * zoom,
-					y + (display.getHeight() - lrwall.getHeight()) * zoom);
+			gc.getGraphics().drawImage(lrwall.getScaledCopy(ITPT.zoom),
+					x + (display.getWidth() / 2-1) * ITPT.zoom,
+					y + (display.getHeight() - lrwall.getHeight()) * ITPT.zoom);
 		if (wall[WALL_LL])
-			gc.getGraphics().drawImage(llwall.getScaledCopy(zoom),
-					x - 1 * zoom,
-					y + (display.getHeight() - llwall.getHeight()) * zoom);
+			gc.getGraphics().drawImage(llwall.getScaledCopy(ITPT.zoom),
+					x - ITPT.zoom,
+					y + (display.getHeight() - llwall.getHeight()) * ITPT.zoom);
 	}
 }

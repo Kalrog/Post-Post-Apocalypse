@@ -29,16 +29,13 @@ public class Main extends BasicGame {
 	/** The window's height */
 	public static final int WINDOW_HEIGHT = 600;
 
+	static AppGameContainer appgc;
 	boolean showFPS = true;
-	boolean init = true;
 	boolean build = false;
 	boolean rect = false;
-	boolean drag = false;
-	boolean dragr = false;
 	int gamestate = STATE_MAINMENU;
 	float tx, ty, ux, uy;
 	int startx, starty;
-	float uiSize = 5;
 	UnicodeFont font;
 	Map map;
 	AStarPathFinder pathfinder;
@@ -48,7 +45,6 @@ public class Main extends BasicGame {
 		super(gamename);
 	}
 
-	@Override
 	public void keyPressed(int key, char c) {
 		switch (gamestate) {
 		case STATE_MAINMENU:
@@ -69,7 +65,6 @@ public class Main extends BasicGame {
 		}
 	}
 
-	@Override
 	public void keyReleased(int key, char c) {
 		switch (gamestate) {
 		case STATE_MAINMENU:
@@ -83,7 +78,6 @@ public class Main extends BasicGame {
 		}
 	}
 
-	@Override
 	public void mouseMoved(int oldx, int oldy, int newx, int newy) {
 		switch (gamestate) {
 		case STATE_MAINMENU:
@@ -97,7 +91,6 @@ public class Main extends BasicGame {
 		}
 	}
 
-	@Override
 	public void mouseWheelMoved(int change) {
 		switch (gamestate) {
 		case STATE_MAINMENU:
@@ -118,7 +111,6 @@ public class Main extends BasicGame {
 
 	}
 
-	@Override
 	public void mouseDragged(int oldx, int oldy, int newx, int newy) {
 		switch (gamestate) {
 		case STATE_MAINMENU:
@@ -127,8 +119,8 @@ public class Main extends BasicGame {
 			break;
 		case STATE_GAME:
 			if (!build) {
-				ITPT.xoffset = ITPT.xoffset + newx - oldx;
-				ITPT.yoffset = ITPT.yoffset + newy - oldy;
+				ITPT.xoffset += (newx - oldx) / ITPT.zoom;
+				ITPT.yoffset += (newy - oldy) / ITPT.zoom;
 			}
 			break;
 		case STATE_PAUSE:
@@ -136,7 +128,6 @@ public class Main extends BasicGame {
 		}
 	}
 
-	@Override
 	public void mouseClicked(int button, int x, int y, int clickCount) {
 		switch (gamestate) {
 		case STATE_MAINMENU:
@@ -150,7 +141,6 @@ public class Main extends BasicGame {
 		}
 	}
 
-	@Override
 	public void mousePressed(int button, int x, int y) {
 		switch (gamestate) {
 		case STATE_MAINMENU:
@@ -159,32 +149,31 @@ public class Main extends BasicGame {
 		case STATE_OPTIONSMENU:
 			break;
 		case STATE_GAME:
-			if (button == 0)
-				drag = true;
-			if (button == 1)
-				dragr = true;
 			startx = x;
 			starty = y;
-			float sx = ITPT.tileatX(x, y);
-			float sy = ITPT.tileatY(x, y);
-			float ax = ITPT.tilewidth / 2 * ITPT.zoom + ITPT.tileX(sx, sy);
-			float ay = ITPT.tileheight / 2 * ITPT.zoom + ITPT.tileY(sx, sy);
-			if (build && !rect) {
+			int sx = (int) ITPT.tileatX(x, y);
+			int sy = (int) ITPT.tileatY(x, y);
+
+			if (build
+					&& !rect
+					&& !(sx < 0 || sy > Map.MAP_SIZE || sx > Map.MAP_SIZE || sy < 0)) {
+				float ax = ITPT.tilewidth / 2 * ITPT.zoom + ITPT.tileX(sx, sy);
+				float ay = ITPT.tileheight / 2 * ITPT.zoom + ITPT.tileY(sx, sy);
 				if (ax < x) {
 					if (ay < y) {
-						map.getTile((int) sx, (int) sy).setWall(Tile.WALL_LR,
-								button == 0);
+						map.getTile(sx, sy).setWall(Tile.WALL_LR, button == 0);
 					} else {
-						map.getTile((int) sx, (int) sy - 1).setWall(
-								Tile.WALL_LL, button == 0);
+						if (sy > 0)
+							map.getTile(sx, sy - 1).setWall(Tile.WALL_LL,
+									button == 0);
 					}
 				} else {
 					if (ay < y) {
-						map.getTile((int) sx, (int) sy).setWall(Tile.WALL_LL,
-								button == 0);
+						map.getTile(sx, sy).setWall(Tile.WALL_LL, button == 0);
 					} else {
-						map.getTile((int) sx - 1, (int) sy).setWall(
-								Tile.WALL_LR, button == 0);
+						if(sx > 0)
+						map.getTile(sx - 1, sy).setWall(Tile.WALL_LR,
+								button == 0);
 					}
 				}
 			} else {
@@ -203,7 +192,6 @@ public class Main extends BasicGame {
 		}
 	}
 
-	@Override
 	public void mouseReleased(int button, int x, int y) {
 		switch (gamestate) {
 		case STATE_MAINMENU:
@@ -211,70 +199,15 @@ public class Main extends BasicGame {
 		case STATE_OPTIONSMENU:
 			break;
 		case STATE_GAME:
-			if (build && rect && (drag || dragr)) {
+			if (build && rect) {
 				float sx, sy, ex, ey;
 				sx = ITPT.tileatX(startx, starty);
 				sy = ITPT.tileatY(startx, starty);
 				ex = ITPT.tileatX(x, y);
 				ey = ITPT.tileatY(x, y);
-				if (sx + sy > ex + ey) {
-					for (int i = (int) ex; i <= sx; i++) {
-						for (int j = (int) ey; j <= sy; j++) {
-							if (dragr) {
-								map.getTile(i, j).setWall(Tile.WALL_LR, false);
-								map.getTile(i, j).setWall(Tile.WALL_LL, false);
-							}
-							if (drag) {
-								if (i == (int) ex) {
-									map.getTile(i - 1, j).setWall(Tile.WALL_LR,
-											true);
-								}
-								if (j == (int) ey) {
-									map.getTile(i, j - 1).setWall(Tile.WALL_LL,
-											true);
-								}
-								if (i == (int) sx) {
-									map.getTile(i, j).setWall(Tile.WALL_LR,
-											true);
-								}
-								if (j == (int) sy) {
-									map.getTile(i, j).setWall(Tile.WALL_LL,
-											true);
-								}
-							}
-						}
-					}
-				} else {
-					for (int i = (int) sx; i <= ex; i++) {
-						for (int j = (int) sy; j <= ey; j++) {
-							if (dragr) {
-								map.getTile(i, j).setWall(Tile.WALL_LR, false);
-								map.getTile(i, j).setWall(Tile.WALL_LL, false);
-							}
-							if (drag) {
-								if (i == (int) sx) {
-									map.getTile(i - 1, j).setWall(Tile.WALL_LR,
-											true);
-								}
-								if (j == (int) sy) {
-									map.getTile(i, j - 1).setWall(Tile.WALL_LL,
-											true);
-								}
-								if (i == (int) ex) {
-									map.getTile(i, j).setWall(Tile.WALL_LR,
-											true);
-								}
-								if (j == (int) ey) {
-									map.getTile(i, j).setWall(Tile.WALL_LL,
-											true);
-								}
-							}
-						}
-					}
-				}
+				map.wallrect((int) ex, (int) ey, (int) sx, (int) sy,
+						button == 0, button == 1);
 			}
-			drag = false;
-			dragr = false;
 			break;
 		case STATE_PAUSE:
 			break;
@@ -283,7 +216,6 @@ public class Main extends BasicGame {
 
 	public static void main(String[] args) {
 		try {
-			AppGameContainer appgc;
 			appgc = new AppGameContainer(new Main("ZOMBIES!"));
 			appgc.setDisplayMode(WINDOW_WIDTH, WINDOW_HEIGHT, false);
 			appgc.start();
@@ -293,9 +225,9 @@ public class Main extends BasicGame {
 	}
 
 	@SuppressWarnings("unchecked")
-	@Override
 	public void init(GameContainer gc) throws SlickException {
-		ITPT.configure(gc.getWidth() / 2, -gc.getHeight() / 2, 14, 8, 8, 25, 2);
+		ITPT.configure(0, -WINDOW_HEIGHT / 2, 16, 8, 8, 25, 14, 25,
+				WINDOW_WIDTH, WINDOW_HEIGHT, 2);
 		map = new Map(new Image("res/Tiles.png"), new Image("res/Walls.png"));
 		map.test();
 		pathfinder = new AStarPathFinder(map, 300, false);
@@ -316,7 +248,6 @@ public class Main extends BasicGame {
 		font.loadGlyphs();
 	}
 
-	@Override
 	public void update(GameContainer gc, int i) throws SlickException {
 		switch (gamestate) {
 		case STATE_MAINMENU:
@@ -330,7 +261,6 @@ public class Main extends BasicGame {
 		}
 	}
 
-	@Override
 	public void render(GameContainer gc, Graphics g) throws SlickException {
 		switch (gamestate) {
 		case STATE_MAINMENU:
