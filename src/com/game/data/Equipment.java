@@ -35,6 +35,6 @@ public class Equipment extends Item {
 	}
 
 	public void draw(float x, float y) {
-		display.draw(x, y + (Datacenter.tileheight - Datacenter.unitheight - 1) * Datacenter.zoom, Datacenter.zoom);
+		display.draw(x, y + (Datacenter.TILEHEIGHT - Datacenter.UNITHEIGHT - 1) * Datacenter.zoom, Datacenter.zoom);
 	}
 }

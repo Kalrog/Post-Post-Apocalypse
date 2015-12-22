@@ -40,7 +40,7 @@ public class Unit {
 	}
 
 	public void draw(float x, float y) {
-		display.draw(x, y + (Datacenter.tileheight - Datacenter.unitheight - 1) * Datacenter.zoom, Datacenter.zoom);
+		display.draw(x, y + (Datacenter.TILEHEIGHT - Datacenter.UNITHEIGHT - 1) * Datacenter.zoom, Datacenter.zoom);
 		for (int i = 0; i < equip.length; i++)
 			if (equip[i] != null)
 				equip[i].draw(x, y);

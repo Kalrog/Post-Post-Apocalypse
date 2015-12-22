@@ -30,19 +30,19 @@ public class Datacenter {
 
 	public static float zoom;
 
-	public static final int tilewidth = 14;
+	public static final int TILEWIDTH = 14;
 
-	public static final int tileheight = 8;
+	public static final int TILEHEIGHT = 8;
 
-	public static final int wallwidth = 8;
+	public static final int WALLWIDTH = 8;
 
-	public static final int wallheight = 25;
+	public static final int WALLHEIGHT = 25;
 
 	public static List<Tile> Tilelist;
 
-	public static final int unitwidth = 14;
+	public static final int UNITWIDTH = 14;
 
-	public static final int unitheight = 25;
+	public static final int UNITHEIGHT = 25;
 
 	public static void setup(int x, int y, int ww, int wh, int z) {
 		xoffset = x;
@@ -55,9 +55,9 @@ public class Datacenter {
 	public static void createTiles() {
 		try {
 			Tilelist = new ArrayList<Tile>();
-			SpriteSheet tiles = new SpriteSheet(PATH_TILE, tilewidth, tileheight);
+			SpriteSheet tiles = new SpriteSheet(PATH_TILE, TILEWIDTH, TILEHEIGHT);
 			tiles.setFilter(SpriteSheet.FILTER_NEAREST);
-			SpriteSheet walls = new SpriteSheet(PATH_WALL, wallwidth, wallheight);
+			SpriteSheet walls = new SpriteSheet(PATH_WALL, WALLWIDTH, WALLHEIGHT);
 			walls.setFilter(SpriteSheet.FILTER_NEAREST);
 			Scanner in = new Scanner(new File(PATH_DATA));
 			String line;
@@ -89,11 +89,11 @@ public class Datacenter {
 	}
 
 	public static int tileX(int x, int y) {
-		return (int) (windowwidth / 2 + (xoffset + (x - y) * (tilewidth+2) / 2 ) * zoom);
+		return (int) (windowwidth / 2 + (xoffset + (x - y) * (TILEWIDTH+2) / 2 ) * zoom);
 	}
 
 	public static int tileY(int x, int y) {
-		return (int) (windowheight / 2 + (yoffset + (x + y) * tileheight / 2) * zoom);
+		return (int) (windowheight / 2 + (yoffset + (x + y) * TILEHEIGHT / 2) * zoom);
 	}
 
 	public static int[] tile(int x, int y) {
@@ -101,11 +101,11 @@ public class Datacenter {
 	}
 
 	public static int tileatX(float mx, float my) {
-		return Math.round(((my - windowheight / 2 - yoffset * zoom) / tileheight + (mx - windowwidth / 2 - xoffset * zoom) / (tilewidth+2)) / zoom - 1);
+		return Math.round(((my - windowheight / 2 - yoffset * zoom) / TILEHEIGHT + (mx - windowwidth / 2 - xoffset * zoom) / (TILEWIDTH+2)) / zoom - 1);
 	}
 
 	public static int tileatY(float mx, float my) {
-		return Math.round(((my - windowheight / 2 - yoffset * zoom) / tileheight - (mx - windowwidth / 2 - xoffset * zoom) / (tilewidth+2)) / zoom);
+		return Math.round(((my - windowheight / 2 - yoffset * zoom) / TILEHEIGHT - (mx - windowwidth / 2 - xoffset * zoom) / (TILEWIDTH+2)) / zoom);
 	}
 
 	public static int[] tileat(float mx, float my) {

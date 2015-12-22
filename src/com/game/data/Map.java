@@ -33,10 +33,10 @@ public class Map implements TileBasedMap {
 				float tx = Datacenter.tileX(i, j);
 				float ty = Datacenter.tileY(i, j);
 				if (tx > Datacenter.windowwidth + 1 * Datacenter.zoom
-						|| ty < 0 - Datacenter.tileheight * Datacenter.zoom)
+						|| ty < 0 - Datacenter.TILEHEIGHT * Datacenter.zoom)
 					continue;
-				if (ty - Datacenter.wallheight * Datacenter.zoom > Datacenter.windowheight
-						|| tx < 0 - Datacenter.tilewidth * Datacenter.zoom)
+				if (ty - Datacenter.WALLHEIGHT * Datacenter.zoom > Datacenter.windowheight
+						|| tx < 0 - Datacenter.TILEWIDTH * Datacenter.zoom)
 					break;
 				tiles[i][j].draw(tx, ty, Datacenter.zoom);
 				if (units[i][j] != null)
@@ -110,9 +110,9 @@ public class Map implements TileBasedMap {
 
 	public void test() {
 		try {
-			SpriteSheet weapon = new SpriteSheet("res/img/Weapon.png", Datacenter.unitwidth, Datacenter.unitheight);
+			SpriteSheet weapon = new SpriteSheet("res/img/Weapon.png", Datacenter.UNITWIDTH, Datacenter.UNITHEIGHT);
 			weapon.setFilter(SpriteSheet.FILTER_NEAREST);
-			SpriteSheet armor = new SpriteSheet("res/img/Armor.png", Datacenter.unitwidth, Datacenter.unitheight);
+			SpriteSheet armor = new SpriteSheet("res/img/Armor.png", Datacenter.UNITWIDTH, Datacenter.UNITHEIGHT);
 			armor.setFilter(SpriteSheet.FILTER_NEAREST);
 			Image unit = new Image("res/img/Units.png");
 			unit.setFilter(Image.FILTER_NEAREST);

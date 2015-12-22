@@ -30,11 +30,14 @@ public class Main extends BasicGame {
 	/** The game is displaying the options menu */
 	public static final int STATE_OPTIONSMENU = 1;
 
-	/** The game is in-game */
-	public static final int STATE_GAME = 2;
+	/** The game is in the action perspective */
+	public static final int STATE_ACTION = 2;
+
+	/** The game is in the build perspective */
+	public static final int STATE_OVERWORLD = 3;
 
 	/** The game is displaying the in-game pause menu */
-	public static final int STATE_PAUSE = 3;
+	public static final int STATE_PAUSE = 4;
 
 	/** The window's width */
 	public static final int WINDOW_WIDTH = 800;
@@ -95,7 +98,7 @@ public class Main extends BasicGame {
 			break;
 		case STATE_OPTIONSMENU:
 			break;
-		case STATE_GAME:
+		case STATE_ACTION:
 			if (key == Input.KEY_ESCAPE)
 				gamestate = STATE_MAINMENU;
 			if (c == 'n')
@@ -120,8 +123,13 @@ public class Main extends BasicGame {
 				build = !build;
 			if (c == 'r')
 				rect = !rect;
-			if (c == 'g' && lt[0] >= 0 && lt[0] < Map.MAP_SIZE && lt[1] >= 0 && lt[1] < Map.MAP_SIZE && rt[0] >= 0 && rt[0] < Map.MAP_SIZE && rt[1] >= 0 && rt[1] < Map.MAP_SIZE)
+			if (c == 'g' && lt[0] >= 0 && lt[0] < Map.MAP_SIZE && lt[1] >= 0 && lt[1] < Map.MAP_SIZE && rt[0] >= 0
+					&& rt[0] < Map.MAP_SIZE && rt[1] >= 0 && rt[1] < Map.MAP_SIZE)
 				path = pathfinder.findPath(null, lt[0], lt[1], rt[0], rt[1]);
+			break;
+		case STATE_OVERWORLD:
+			if (key == Input.KEY_ESCAPE)
+				gamestate = STATE_MAINMENU;
 			break;
 		case STATE_PAUSE:
 			break;
@@ -136,7 +144,7 @@ public class Main extends BasicGame {
 			break;
 		case STATE_OPTIONSMENU:
 			break;
-		case STATE_GAME:
+		case STATE_ACTION:
 			break;
 		case STATE_PAUSE:
 			break;
@@ -149,7 +157,7 @@ public class Main extends BasicGame {
 			break;
 		case STATE_OPTIONSMENU:
 			break;
-		case STATE_GAME:
+		case STATE_ACTION:
 			break;
 		case STATE_PAUSE:
 			break;
@@ -164,7 +172,7 @@ public class Main extends BasicGame {
 			break;
 		case STATE_OPTIONSMENU:
 			break;
-		case STATE_GAME:
+		case STATE_ACTION:
 			if (change < 0) {
 				Datacenter.zoom /= 2;
 			}
@@ -183,7 +191,7 @@ public class Main extends BasicGame {
 			break;
 		case STATE_OPTIONSMENU:
 			break;
-		case STATE_GAME:
+		case STATE_ACTION:
 			if (!build) {
 				Datacenter.xoffset += (newx - oldx) / Datacenter.zoom;
 				Datacenter.yoffset += (newy - oldy) / Datacenter.zoom;
@@ -200,7 +208,7 @@ public class Main extends BasicGame {
 			break;
 		case STATE_OPTIONSMENU:
 			break;
-		case STATE_GAME:
+		case STATE_ACTION:
 			break;
 		case STATE_PAUSE:
 			break;
@@ -212,41 +220,40 @@ public class Main extends BasicGame {
 			System.out.println("Mouse Pressed (" + x + "|" + y + ")" + button);
 		switch (gamestate) {
 		case STATE_MAINMENU:
-			gamestate = STATE_GAME;
+			if (button == 0) {
+				gamestate = STATE_OVERWORLD;
+			}
+			if (button == 1) {
+				gamestate = STATE_ACTION;
+			}
 			break;
 		case STATE_OPTIONSMENU:
 			break;
-		case STATE_GAME:
+		case STATE_ACTION:
 			start[0] = x;
 			start[1] = y;
 
 			/** Position of the tile that was pressed */
 			int[] s = Datacenter.tileat(x, y);
 
-			if (!(s[0] < 1 || s[1] > Map.MAP_SIZE-1 || s[0] > Map.MAP_SIZE-1 || s[1] < 1))
+			if (!(s[0] < 1 || s[1] > Map.MAP_SIZE - 1 || s[0] > Map.MAP_SIZE - 1 || s[1] < 1))
 				if (build && !rect && !wall) {
 					map.setTile(s[0], s[1], selected.getCopy());
 				} else if (build && !rect && wall) {
 					/** Center of the pressed tile */
 					int[] a = Datacenter.tile(s[0], s[1]);
-					a[0] += Datacenter.tilewidth * Datacenter.zoom / 2;
-					a[1] += Datacenter.tileheight * Datacenter.zoom / 2;
-					/* Create a wall depending on where the tile was pressed
+					a[0] += Datacenter.TILEWIDTH * Datacenter.zoom / 2;
+					a[1] += Datacenter.TILEHEIGHT * Datacenter.zoom / 2;
+					/*
+					 * Create a wall depending on where the tile was pressed
 					 * 
-					 *		XNNNNNNNNNNNNNN
-					 *		Xs[0]|s[1]    N
-					 *		X             N
-					 *		X     ##      N
-					 *		X     ##      N
-					 *		X             N
-					 *		X             N
-					 *		XXXXXXXXXXXXXXX
-					 *		# = a[0]|a[1]
-					 *		X = tile walls
-					 *		N = neighbour walls
+					 * XNNNNNNNNNNNNNN Xs[0]|s[1] N X N X ## N X ## N X N X N
+					 * XXXXXXXXXXXXXXX # = a[0]|a[1] X = tile walls N =
+					 * neighbour walls
 					 * 
-					 *  */
-					map.getTile(s[0] - ((a[0] > x && a[1] > y) ? 1 : 0), s[1] - ((a[0] < x && a[1] > y) ? 1 : 0)).setWall((a[0] < x == a[1] < y) ? Tile.WALL_LR : Tile.WALL_LL, button == 0);
+					 */
+					map.getTile(s[0] - ((a[0] > x && a[1] > y) ? 1 : 0), s[1] - ((a[0] < x && a[1] > y) ? 1 : 0))
+							.setWall((a[0] < x == a[1] < y) ? Tile.WALL_LR : Tile.WALL_LL, button == 0);
 				} else {
 					if (button == 0) {
 						map.getTile(lt[0], lt[1]).setColor(new Color(255, 255, 255, 255));
@@ -261,6 +268,8 @@ public class Main extends BasicGame {
 					}
 				}
 			break;
+		case STATE_OVERWORLD:
+			break;
 		case STATE_PAUSE:
 			break;
 		}
@@ -274,7 +283,7 @@ public class Main extends BasicGame {
 			break;
 		case STATE_OPTIONSMENU:
 			break;
-		case STATE_GAME:
+		case STATE_ACTION:
 			if (build && rect) {
 				int[] s = Datacenter.tileat(start[0], start[1]);
 				int[] e = Datacenter.tileat(x, y);
@@ -330,7 +339,7 @@ public class Main extends BasicGame {
 			break;
 		case STATE_OPTIONSMENU:
 			break;
-		case STATE_GAME:
+		case STATE_ACTION:
 			break;
 		case STATE_PAUSE:
 			break;
@@ -343,11 +352,14 @@ public class Main extends BasicGame {
 			g.setAntiAlias(false);
 			g.setBackground(Color.darkGray);
 			g.setFont(font);
-			g.drawString("Keys:\n" + "toggle build mode : b\n" + "toggle rectangle build mode : r\n" + "toggle wall build mode : w\n" + "point 1 : LMB\n" + "point 2 : RMB\n" + "select next tile:p\n" + "select previous tile : o\n" + "generate path from point 1 to point 2 : g\n" + "click anywhere to start", 300, 200);
+			g.drawString("Keys:\n" + "toggle build mode : b\n" + "toggle rectangle build mode : r\n"
+					+ "toggle wall build mode : w\n" + "point 1 : LMB\n" + "point 2 : RMB\n" + "select next tile:p\n"
+					+ "select previous tile : o\n" + "generate path from point 1 to point 2 : g\n"
+					+ "click anywhere to start", 300, 200);
 			break;
 		case STATE_OPTIONSMENU:
 			break;
-		case STATE_GAME:
+		case STATE_ACTION:
 			g.setAntiAlias(false);
 			g.setBackground(Color.black);
 			g.setFont(font);
@@ -356,16 +368,19 @@ public class Main extends BasicGame {
 				for (int n = 1; n < path.getLength(); n++) {
 					int[] a = Datacenter.tile(path.getStep(n).getX(), path.getStep(n).getY());
 					int[] b = Datacenter.tile(path.getStep(n - 1).getX(), path.getStep(n - 1).getY());
-					a[0] += Datacenter.tilewidth / 2 * Datacenter.zoom;
-					a[1] += Datacenter.tileheight / 2 * Datacenter.zoom;
-					b[0] += Datacenter.tilewidth / 2 * Datacenter.zoom;
-					b[1] += Datacenter.tileheight / 2 * Datacenter.zoom;
+					a[0] += Datacenter.TILEWIDTH / 2 * Datacenter.zoom;
+					a[1] += Datacenter.TILEHEIGHT / 2 * Datacenter.zoom;
+					b[0] += Datacenter.TILEWIDTH / 2 * Datacenter.zoom;
+					b[1] += Datacenter.TILEHEIGHT / 2 * Datacenter.zoom;
 					g.setColor(Color.red);
 					g.drawLine(a[0], a[1], b[0], b[1]);
 					if (n == path.getLength() - 1 || n == 1)
 						g.fillRect(a[0] - 4, a[1] - 4, 8, 8);
 					if (n > 1 && n < path.getLength() - 1)
-						if (path.getStep(n).getY() - path.getStep(n - 1).getY() != path.getStep(n + 1).getY() - path.getStep(n).getY() || path.getStep(n).getX() - path.getStep(n - 1).getX() != path.getStep(n + 1).getX() - path.getStep(n).getX())
+						if (path.getStep(n).getY() - path.getStep(n - 1).getY() != path.getStep(n + 1).getY()
+								- path.getStep(n).getY()
+								|| path.getStep(n).getX() - path.getStep(n - 1).getX() != path.getStep(n + 1).getX()
+										- path.getStep(n).getX())
 							g.fillRect(a[0] - 4, a[1] - 4, 8, 8);
 				}
 			}
@@ -381,6 +396,10 @@ public class Main extends BasicGame {
 			g.drawString("Build:" + build, 600, 490);
 			g.drawString("Wall:" + wall, 600, 520);
 			g.drawString("Rectangle:" + rect, 600, 550);
+			break;
+		case STATE_OVERWORLD:
+			g.setAntiAlias(false);
+			g.setColor(Color.black);
 			break;
 		case STATE_PAUSE:
 			break;
