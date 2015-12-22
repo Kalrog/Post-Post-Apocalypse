@@ -32,9 +32,11 @@ public class Map implements TileBasedMap {
 			for (int j = 0; j < MAP_SIZE; j++) {
 				float tx = Datacenter.tileX(i, j);
 				float ty = Datacenter.tileY(i, j);
-				if (tx > Datacenter.windowwidth + 1 * Datacenter.zoom || ty < 0 - Datacenter.tileheight * Datacenter.zoom)
+				if (tx > Datacenter.windowwidth + 1 * Datacenter.zoom
+						|| ty < 0 - Datacenter.tileheight * Datacenter.zoom)
 					continue;
-				if (ty - Datacenter.wallheight * Datacenter.zoom > Datacenter.windowheight || tx < 0 - Datacenter.tilewidth * Datacenter.zoom)
+				if (ty - Datacenter.wallheight * Datacenter.zoom > Datacenter.windowheight
+						|| tx < 0 - Datacenter.tilewidth * Datacenter.zoom)
 					break;
 				tiles[i][j].draw(tx, ty, Datacenter.zoom);
 				if (units[i][j] != null)
@@ -45,6 +47,7 @@ public class Map implements TileBasedMap {
 	}
 
 	public void rect(int x1, int y1, int x2, int y2, boolean set, boolean wall, Tile t) {
+		/* Switch positions until y1 < y2 and x1 < x2 */
 		if (y2 < y1) {
 			y2 += y1;
 			y1 = y2 - y1;
@@ -67,7 +70,7 @@ public class Map implements TileBasedMap {
 					tiles[i][j].setDisplay(t.getDisplay());
 					tiles[i][j].setLlwall(t.getLlwall());
 					tiles[i][j].setLrwall(t.getLrwall());
-				} else if (set) {
+				} else if (wall) {
 					if (i == x1 && i > 0) {
 						tiles[i - 1][j].setWall(Tile.WALL_LR, set);
 					}
@@ -80,10 +83,11 @@ public class Map implements TileBasedMap {
 					if (j == y2) {
 						tiles[i][j].setWall(Tile.WALL_LL, set);
 					}
-				} else if (!set) {
-					tiles[i][j].setWall(Tile.WALL_LR, set);
-					tiles[i][j].setWall(Tile.WALL_LL, set);
-				}
+					if (!set){
+						tiles[i][j].setWall(Tile.WALL_LR, set);
+						tiles[i][j].setWall(Tile.WALL_LL, set);
+					}
+				} 
 			}
 		}
 	}

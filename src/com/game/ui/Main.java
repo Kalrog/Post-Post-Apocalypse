@@ -223,7 +223,7 @@ public class Main extends BasicGame {
 			/** Position of the tile that was pressed */
 			int[] s = Datacenter.tileat(x, y);
 
-			if (!(s[0] < 0 || s[1] > Map.MAP_SIZE || s[0] > Map.MAP_SIZE || s[1] < 0))
+			if (!(s[0] < 1 || s[1] > Map.MAP_SIZE-1 || s[0] > Map.MAP_SIZE-1 || s[1] < 1))
 				if (build && !rect && !wall) {
 					map.setTile(s[0], s[1], selected.getCopy());
 				} else if (build && !rect && wall) {
