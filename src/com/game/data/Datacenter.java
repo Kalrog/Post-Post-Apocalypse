@@ -48,7 +48,7 @@ public class Datacenter {
 	
 	public static final int OV_TILEWIDTH = (int) (OV_TILEHEIGHT * 1.75);
 	
-	public static final int MAX_BUILDINGHEIGHT = (int) (OV_TILEHEIGHT*3);
+	public static final int MAX_BUILDINGHEIGHT = OV_TILEHEIGHT*3;
 	
 	public static final int MAX_BUILDINGWIDTH = OV_TILEWIDTH;
 
