@@ -43,6 +43,14 @@ public class Datacenter {
 	public static final int UNITWIDTH = 14;
 
 	public static final int UNITHEIGHT = 25;
+	
+	public static final int OV_TILEHEIGHT = 8;
+	
+	public static final int OV_TILEWIDTH = (int) (OV_TILEHEIGHT * 1.75);
+	
+	public static final int MAX_BUILDINGHEIGHT = (int) (OV_TILEHEIGHT*3);
+	
+	public static final int MAX_BUILDINGWIDTH = OV_TILEWIDTH;
 
 	public static void setup(int x, int y, int ww, int wh, int z) {
 		xoffset = x;
