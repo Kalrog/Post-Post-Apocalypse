@@ -15,8 +15,8 @@ public class Map implements TileBasedMap {
 
 	/** The units that are currently on the map */
 	Unit[][] units = new Unit[MAP_SIZE][MAP_SIZE];
-	
-	Image[][] maps = new Image[Overworld.OVERWORLD_SIZE][Overworld.OVERWORLD_SIZE];
+
+	Image maps;
 
 	public Map() {
 	}
