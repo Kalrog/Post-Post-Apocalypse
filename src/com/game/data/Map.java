@@ -15,8 +15,16 @@ public class Map implements TileBasedMap {
 
 	/** The units that are currently on the map */
 	Unit[][] units = new Unit[MAP_SIZE][MAP_SIZE];
+	
+	Image[][] maps = new Image[Overworld.OVERWORLD_SIZE][Overworld.OVERWORLD_SIZE];
 
 	public Map() {
+	}
+
+	Image overworldRep;
+
+	public Image getOverworldRep() {
+		return overworldRep;
 	}
 
 	/**
@@ -83,11 +91,11 @@ public class Map implements TileBasedMap {
 					if (j == y2) {
 						tiles[i][j].setWall(Tile.WALL_LL, set);
 					}
-					if (!set){
+					if (!set) {
 						tiles[i][j].setWall(Tile.WALL_LR, set);
 						tiles[i][j].setWall(Tile.WALL_LL, set);
 					}
-				} 
+				}
 			}
 		}
 	}

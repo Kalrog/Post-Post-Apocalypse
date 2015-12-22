@@ -352,6 +352,7 @@ public class Main extends BasicGame {
 			g.setAntiAlias(false);
 			g.setBackground(Color.darkGray);
 			g.setFont(font);
+			g.setColor(Color.white);
 			g.drawString("Keys:\n" + "toggle build mode : b\n" + "toggle rectangle build mode : r\n"
 					+ "toggle wall build mode : w\n" + "point 1 : LMB\n" + "point 2 : RMB\n" + "select next tile:p\n"
 					+ "select previous tile : o\n" + "generate path from point 1 to point 2 : g\n"
@@ -399,7 +400,7 @@ public class Main extends BasicGame {
 			break;
 		case STATE_OVERWORLD:
 			g.setAntiAlias(false);
-			g.setColor(Color.black);
+			g.setBackground(Color.black);
 			break;
 		case STATE_PAUSE:
 			break;
