@@ -1,7 +1,6 @@
 package com.game.ui;
 
 import java.awt.BasicStroke;
-import java.awt.event.KeyEvent;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -10,18 +9,19 @@ import org.newdawn.slick.BasicGame;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
-import org.newdawn.slick.Image;
 import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.UnicodeFont;
 import org.newdawn.slick.font.effects.ColorEffect;
 import org.newdawn.slick.font.effects.OutlineEffect;
 import org.newdawn.slick.gui.TextField;
-import org.newdawn.slick.opengl.InternalTextureLoader;
 import org.newdawn.slick.util.pathfinding.AStarPathFinder;
 import org.newdawn.slick.util.pathfinding.Path;
 
-import com.game.data.*;
+import com.game.data.Datacenter;
+import com.game.data.Map;
+import com.game.data.Mapgen;
+import com.game.data.Tile;
 
 public class Main extends BasicGame {
 	/** The game is in the main menu */

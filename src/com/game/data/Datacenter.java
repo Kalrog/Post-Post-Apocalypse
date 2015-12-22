@@ -6,12 +6,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.SpriteSheet;
 
 public class Datacenter {
-	public static final boolean LOG = false;
+	public static final boolean LOG = true;
 
 	public static final String PATH_WALL = "res/img/Walls.png";
 

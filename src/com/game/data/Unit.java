@@ -2,7 +2,6 @@ package com.game.data;
 
 import java.util.List;
 
-import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.util.pathfinding.Path;
 
