@@ -12,7 +12,7 @@ public class Overworld implements TileBasedMap {
 	Tile[][] tiles = new Tile[OVERWORLD_SIZE][OVERWORLD_SIZE];
 
 	/** The units that are currently on the map */
-	Unit[][] units = new Unit[OVERWORLD_SIZE][OVERWORLD_SIZE];
+	Squad[][][] squad = new Squad[OVERWORLD_SIZE][OVERWORLD_SIZE][10];
 
 	public void draw() {
 
